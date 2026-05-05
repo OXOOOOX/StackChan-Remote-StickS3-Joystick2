@@ -4,7 +4,7 @@ This repository contains firmware assets and source patches for using an M5Stick
 
 The physical controller enclosure is based on this MakerWorld model:
 
-[M5 StickC 遥控附件摇杆灯 - MakerWorld](https://makerworld.com.cn/zh/models/2418504-m5-stickc-yao-kong-fu-jian-yao-gan-deng#profileId-2752841)
+[M5 StickC 遥控附件摇杆等 - MakerWorld](https://makerworld.com.cn/zh/models/2418504-m5-stickc-yao-kong-fu-jian-yao-gan-deng#profileId-2752841)
 
 ## Firmware
 
