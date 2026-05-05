@@ -4,12 +4,12 @@ This repository contains firmware assets and source patches for using an M5Stick
 
 The physical controller enclosure is based on this MakerWorld model:
 
-[M5 StickC 遥控附件摇杆等 - MakerWorld](https://makerworld.com.cn/zh/models/2418504-m5-stickc-yao-kong-fu-jian-yao-gan-deng#profileId-2752841)
+[M5 StickC 遥控附件摇杆灯 - MakerWorld](https://makerworld.com.cn/zh/models/2418504-m5-stickc-yao-kong-fu-jian-yao-gan-deng#profileId-2752841)
 
 ## Firmware
 
 ```text
-StackChan-RemoteControl-StickS3-Joystick2_0x3.bin
+StackChan-RemoteControl-StickS3-Joystick2_0x5.bin
 ```
 
 This is the final M5Burner-ready firmware image. Burn it at offset `0x0` with M5Burner `User Custom`.
@@ -27,6 +27,8 @@ The patch adapts the upstream StackChan remote firmware for:
 * 8MB StickS3 flash partition layout
 * Joystick X/Y inversion settings
 * NVS persistence for joystick inversion after reboot
+* Lower display brightness and a slower control loop to reduce battery voltage sag
+* Debounced charging brightness changes to avoid USB plug-in flicker
 
 ## Source Patch
 
@@ -48,14 +50,14 @@ git apply ..\patches\stackchan-remote-sticks3-joystick2.patch
 Open an ESP-IDF 5.4 Command Prompt, then run:
 
 ```cmd
-cd /d C:\Users\23479\Documents\GitHub\M5StackChan\StackChan-official\remote\code
+cd /d C:\Users\23479\Documents\GitHub\StackChan-Remote-StickS3-Joystick2\StackChan-official\remote\code
 package_sticks3_m5burner.cmd
 ```
 
 The final generated M5Burner image used by this repository is:
 
 ```text
-C:\Users\23479\Documents\GitHub\M5StackChan\StackChan-RemoteControl-StickS3-Joystick2_0x3.bin
+C:\Users\23479\Documents\GitHub\StackChan-Remote-StickS3-Joystick2\StackChan-RemoteControl-StickS3-Joystick2_0x5.bin
 ```
 
 ## Hardware
