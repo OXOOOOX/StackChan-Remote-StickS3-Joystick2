@@ -9,7 +9,7 @@ The physical controller enclosure is based on this MakerWorld model:
 ## Firmware
 
 ```text
-StackChan-RemoteControl-StickS3-Joystick2_0x7.bin
+StackChan-RemoteControl-StickS3-Joystick2_0x0.bin
 ```
 
 This is the current tested StickS3 + Unit Joystick2 firmware image. It is a merged `0x0` image for M5Burner `User Custom`.
@@ -49,14 +49,14 @@ git apply ..\patches\stackchan-remote-sticks3-joystick2.patch
 Open an ESP-IDF 5.4 Command Prompt, then run:
 
 ```cmd
-cd /d C:\Users\23479\Documents\GitHub\StackChan-Remote-StickS3-Joystick2
+cd /d <repo-root>
 package_sticks3_m5burner.cmd
 ```
 
 The final generated M5Burner image used by this repository is:
 
 ```text
-C:\Users\23479\Documents\GitHub\StackChan-Remote-StickS3-Joystick2\StackChan-RemoteControl-StickS3-Joystick2_0x7.bin
+<repo-root>\StackChan-RemoteControl-StickS3-Joystick2_0x0.bin
 ```
 
 ## Flash With ESP-IDF
@@ -64,14 +64,14 @@ C:\Users\23479\Documents\GitHub\StackChan-Remote-StickS3-Joystick2\StackChan-Rem
 Open an ESP-IDF 5.4 Command Prompt, connect the StickS3, then run:
 
 ```cmd
-cd /d C:\Users\23479\Documents\GitHub\StackChan-Remote-StickS3-Joystick2
+cd /d <repo-root>
 flash_sticks3_monitor.cmd
 ```
 
 If automatic port detection fails, specify the COM port from Device Manager:
 
 ```cmd
-cd /d C:\Users\23479\Documents\GitHub\StackChan-Remote-StickS3-Joystick2
+cd /d <repo-root>
 flash_sticks3_monitor.cmd -p COM5
 ```
 

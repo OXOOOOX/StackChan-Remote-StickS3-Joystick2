@@ -168,7 +168,7 @@ Remote normal, receiver normal     -> fix is likely valid
 Open ESP-IDF PowerShell or ESP-IDF Command Prompt, then run:
 
 ```powershell
-cd C:\Users\23479\Documents\GitHub\M5StackChan\StackChan-official\remote\code
+cd <repo-root>\StackChan-official\remote\code
 idf.py build
 ```
 
