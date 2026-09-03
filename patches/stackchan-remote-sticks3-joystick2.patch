@@ -4219,3 +4219,138 @@ index 2cc0fcd..48c1b54 100644
  CONFIG_SUPPRESS_SELECT_DEBUG_OUTPUT=y
  CONFIG_SUPPORT_TERMIOS=y
  CONFIG_SEMIHOSTFS_MAX_MOUNT_POINTS=1
+diff --git a/remote/code/main/ui/ui_joystick_settings_screen.c b/remote/code/main/ui/ui_joystick_settings_screen.c
+new file mode 100644
+index 0000000..eab5764
+--- /dev/null
++++ b/remote/code/main/ui/ui_joystick_settings_screen.c
+@@ -0,0 +1,100 @@
++#include "ui_joystick_settings_screen.h"
++#include "ui_setup_screen.h"
++#include "../joystick/joystick_handle.h"
++#include "../lvgl_port.h"
++#include "freertos/FreeRTOS.h"
++#include "freertos/task.h"
++
++lv_obj_t *joystick_settings_screen = NULL;
++static lv_obj_t *invert_x_label    = NULL;
++static lv_obj_t *invert_y_label    = NULL;
++
++static void update_setting_labels(const joystick_data_t *data)
++{
++    lv_label_set_text_fmt(invert_x_label, "Invert X: %s", data->invert_x ? "ON" : "OFF");
++    lv_label_set_text_fmt(invert_y_label, "Invert Y: %s", data->invert_y ? "ON" : "OFF");
++
++    lv_obj_set_style_text_color(invert_x_label,
++                                data->select_mode == INVERT_X_SELECT ? lv_color_make(255, 128, 0) : lv_color_black(),
++                                LV_PART_MAIN);
++    lv_obj_set_style_text_color(invert_y_label,
++                                data->select_mode == INVERT_Y_SELECT ? lv_color_make(255, 128, 0) : lv_color_black(),
++                                LV_PART_MAIN);
++}
++
++void create_joystick_settings_screen(void)
++{
++    while (!lvgl_port_lock()) {
++        vTaskDelay(pdMS_TO_TICKS(10));
++    }
++
++    if (joystick_settings_screen == NULL) {
++        joystick_settings_screen = lv_obj_create(NULL);
++    }
++    lv_obj_clear_flag(joystick_settings_screen, LV_OBJ_FLAG_SCROLLABLE);
++
++    lv_obj_t *title = lv_label_create(joystick_settings_screen);
++    lv_label_set_text(title, "Joystick Settings");
++    lv_obj_set_style_text_font(title, &lv_font_montserrat_14, 0);
++    lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 10);
++
++    invert_x_label = lv_label_create(joystick_settings_screen);
++    lv_label_set_text(invert_x_label, "Invert X: OFF");
++    lv_obj_set_style_text_font(invert_x_label, &lv_font_montserrat_14, 0);
++    lv_obj_align(invert_x_label, LV_ALIGN_TOP_LEFT, 10, 45);
++
++    invert_y_label = lv_label_create(joystick_settings_screen);
++    lv_label_set_text(invert_y_label, "Invert Y: OFF");
++    lv_obj_set_style_text_font(invert_y_label, &lv_font_montserrat_14, 0);
++    lv_obj_align(invert_y_label, LV_ALIGN_TOP_LEFT, 10, 70);
++
++    lv_obj_t *hint = lv_label_create(joystick_settings_screen);
++    lv_label_set_text(hint, "A:Back  B:Select");
++    lv_obj_set_style_text_font(hint, &lv_font_montserrat_14, 0);
++    lv_obj_align(hint, LV_ALIGN_BOTTOM_MID, 0, -8);
++
++    lvgl_port_unlock();
++}
++
++void update_joystick_settings_screen(joystick_data_t *data)
++{
++    bool changed = false;
++
++    while (!lvgl_port_lock()) {
++        vTaskDelay(pdMS_TO_TICKS(10));
++    }
++
++    if (data->joyY > Y_CENTER + DEAD_ZONE || data->joyY < Y_CENTER - DEAD_ZONE) {
++        bool enabled = data->joyY > Y_CENTER + DEAD_ZONE;
++        if (data->select_mode == INVERT_X_SELECT && data->invert_x != enabled) {
++            data->invert_x = enabled;
++            changed        = true;
++        } else if (data->select_mode == INVERT_Y_SELECT && data->invert_y != enabled) {
++            data->invert_y = enabled;
++            changed        = true;
++        }
++    }
++
++    update_setting_labels(data);
++    lvgl_port_unlock();
++
++    if (changed) {
++        joystick_save_settings(data);
++        vTaskDelay(150 / portTICK_PERIOD_MS);
++    }
++}
++
++void ui_joystick_settings_screen_destory(void)
++{
++    while (!lvgl_port_lock()) {
++        vTaskDelay(pdMS_TO_TICKS(10));
++    }
++    if (joystick_settings_screen != NULL) {
++        lv_obj_del(joystick_settings_screen);
++        joystick_settings_screen = NULL;
++    }
++    lvgl_port_unlock();
++
++    invert_x_label = NULL;
++    invert_y_label = NULL;
++}
+diff --git a/remote/code/main/ui/ui_joystick_settings_screen.h b/remote/code/main/ui/ui_joystick_settings_screen.h
+new file mode 100644
+index 0000000..169ad6a
+--- /dev/null
++++ b/remote/code/main/ui/ui_joystick_settings_screen.h
+@@ -0,0 +1,23 @@
++#ifndef _UI_JOYSTICK_SETTINGS_SCREEN_H_
++#define _UI_JOYSTICK_SETTINGS_SCREEN_H_
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include "lvgl.h"
++#include "../joystick/joystick_basic.h"
++
++#define MODE_JOYSTICK_SETTINGS (3)
++
++extern lv_obj_t *joystick_settings_screen;
++
++void create_joystick_settings_screen(void);
++void update_joystick_settings_screen(joystick_data_t *data);
++void ui_joystick_settings_screen_destory(void);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif

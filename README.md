@@ -35,14 +35,54 @@ The patch adapts the upstream StackChan remote firmware for:
 patches/stackchan-remote-sticks3-joystick2.patch
 ```
 
-Apply this patch inside the `StackChan-official` submodule if you want to rebuild the firmware. It includes the StickS3 display setup, Joystick2 support, build configuration, helper scripts, and official StackChan receiver ESP-NOW packet format.
+The patch targets the fixed upstream submodule commit
+`51a06177f7a820762c63c845bb4fe2a563be3eb4`. It includes the StickS3 display setup,
+Joystick2 support, build configuration, helper scripts, and the application
+control fields used by the official StackChan receiver.
 
-From this repository root:
+Start from a fresh clone with its pinned submodule and apply the patch once:
 
 ```cmd
-cd /d StackChan-official
-git apply ..\patches\stackchan-remote-sticks3-joystick2.patch
+git clone --recurse-submodules https://github.com/OXOOOOX/StackChan-Remote-StickS3-Joystick2.git
+cd StackChan-Remote-StickS3-Joystick2
+git -C StackChan-official rev-parse HEAD
+git -C StackChan-official apply --check ..\patches\stackchan-remote-sticks3-joystick2.patch
+git -C StackChan-official apply ..\patches\stackchan-remote-sticks3-joystick2.patch
 ```
+
+The printed submodule SHA must match the commit above. Do not apply the patch
+again to a working tree that already contains these changes.
+
+The 2026-09-03 archive review found that the published patch referenced two local
+files without including their contents:
+
+* `remote/code/main/ui/ui_joystick_settings_screen.c`
+* `remote/code/main/ui/ui_joystick_settings_screen.h`
+
+This source packaging correction adds those two new-file hunks and preserves all
+previous hunks unchanged. A forward `git apply --check` and an actual application
+to an isolated copy of the fixed upstream commit both passed; the required
+project sources and headers were checked there. No firmware was rebuilt or
+flashed for this correction, and the existing `.bin` files are unchanged.
+
+## ESP-NOW Transport Compatibility
+
+The source published at `b61fae0` uses the `espressif/esp-now` high-level
+`espnow_send(ESPNOW_DATA_TYPE_DATA, ...)` transport. Its application control buffer
+is 8 bytes, but the component adds its own framing before calling the native
+ESP-NOW API. This is the route used with the official receiver component.
+
+The older `2ce2b47` patch instead changed the transport to native `esp_now_send`
+for raw payloads. That transport change is absent from the later published
+patch; the later display and joystick fixes must not be treated as proof that
+raw 8-byte UIFlow2 reception also works. For a UIFlow2 receiver, first verify the
+actual received payload length and wire format with a monitor. Reconciling these
+two transport routes remains separate work; this correction changes no device
+logic.
+
+The old local `patches/fix-joystick-output-clamp.patch` is not part of the current
+rebuild sequence. The main patch already contains the packet packing and range
+guards, and the old supplemental patch does not apply to the current sources.
 
 ## Build M5Burner Firmware
 
